@@ -4,9 +4,9 @@ import numpy as np
 from sklearn.metrics import f1_score
 from sklearn.metrics import classification_report as class_rep
 
-
 # torch libs
 import torch
+
 
 def init_weights(model):
     """
@@ -17,10 +17,11 @@ def init_weights(model):
     RETURN:
         the updated weights of the model
     """
-    
+
     if isinstance(model, torch.nn.Linear):
         torch.nn.init.xavier_uniform_(model.weight)
         model.bias.data.fill_(0.01)
+
 
 def load_model(model, pretrained_path):
     """
@@ -36,14 +37,21 @@ def load_model(model, pretrained_path):
     trained_epoch = weights['epoch']
     pretrained_dict = weights['Saved_Model'].state_dict()
     model_dict = model.state_dict()
-    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+    pretrained_dict = {
+        k: v
+        for k, v in pretrained_dict.items() if k in model_dict
+    }
     model_dict.update(pretrained_dict)
     model.load_state_dict(model_dict)
-    
-    return model, trained_epoch 
+
+    return model, trained_epoch
 
 
-def save_checkpoint_classifier(model, epoch, iteration, prefix="", dir_path = None):
+def save_checkpoint_classifier(model,
+                               epoch,
+                               iteration,
+                               prefix="",
+                               dir_path=None):
     """
     Saving pre-trained model for inference
 
@@ -59,18 +67,20 @@ def save_checkpoint_classifier(model, epoch, iteration, prefix="", dir_path = No
     if not dir_path:
         dir_path = "./ClassifierWeights/"
 
-    model_out_path = dir_path + prefix +f"model_epoch_{epoch}_iter_{iteration}.pth"
-    state = {"epoch": epoch ,"Saved_Model": model}
+    model_out_path = dir_path + prefix + f"model_epoch_{epoch}_iter_{iteration}.pth"
+    state = {"epoch": epoch, "Saved_Model": model}
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
     torch.save(state, model_out_path)
     print(f"Classifier Checkpoint saved to {model_out_path}")
 
-        
-def evaluate_classifier(valid_data_loader, cf_model, 
-                        classification_report:bool = False,
-                        device=None):
+
+def evaluate_classifier(valid_data_loader,
+                        cf_model,
+                        classification_report: bool = False,
+                        device=None,
+                        predict_only: bool = False):
     """
     Evaluating the performance of the network on validation/test dataset
 
@@ -79,9 +89,10 @@ def evaluate_classifier(valid_data_loader, cf_model,
         cf_model-> the model which we want to use for validation
         classification_report -> if you want to enable classification report
         device-> if you want to run the evaluation on a specific device
+        predict_only-> if you are not gonna train it
 
     RETURN:
-        None
+        y_pred-> prediction if predict_only is set else None
 
     """
     ##### This could be a bug if a user has GPUs but it not using them!
@@ -90,14 +101,14 @@ def evaluate_classifier(valid_data_loader, cf_model,
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     print("==> Evaluating on Validation Set:")
-    total = 0;
-    correct = 0;
+    total = 0
+    correct = 0
     # for sklearn metrics
-    y_true = np. array([])
-    y_pred = np. array([])
+    y_true = np.array([])
+    y_pred = np.array([])
     with torch.no_grad():
         for sample in valid_data_loader:
-            data, labels = sample;
+            data, labels = sample
             data = data.to(device)
             labels = labels.to(device)
             outputs = cf_model(data)
@@ -105,14 +116,20 @@ def evaluate_classifier(valid_data_loader, cf_model,
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
             # get all the labels for true and pred so we could use them in sklearn metrics
-            y_true = np.append(y_true,labels.detach().cpu().numpy())
-            y_pred = np.append(y_pred,predicted.detach().cpu().numpy())
-            
-    print(f'    -> Accuracy of classifier network on validation set: {(100 * correct / total):4.4f} %' )
+            y_true = np.append(y_true, labels.detach().cpu().numpy())
+            y_pred = np.append(y_pred, predicted.detach().cpu().numpy())
+
+    if predict_only:
+        return y_pred
+
+    print(
+        f'    -> Accuracy of classifier network on validation set: {(100 * correct / total):4.4f} %'
+    )
     # calculating the precision/recall based multi-label F1 score
-    macro_score = f1_score(y_true, y_pred, average = 'macro' )
-    w_score = f1_score(y_true, y_pred,average = 'weighted' )
-    print(f'    -> Non-Weighted F1 Score on validation set: {macro_score:4.4f} ' )
-    print(f'    -> Weighted F1 Score on validation set: {w_score:4.4f} ' )
+    macro_score = f1_score(y_true, y_pred, average='macro')
+    w_score = f1_score(y_true, y_pred, average='weighted')
+    print(
+        f'    -> Non-Weighted F1 Score on validation set: {macro_score:4.4f} ')
+    print(f'    -> Weighted F1 Score on validation set: {w_score:4.4f} ')
     if classification_report:
-        print(class_rep(y_true,y_pred))
+        print(class_rep(y_true, y_pred))
