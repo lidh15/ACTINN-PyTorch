@@ -28,18 +28,17 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     '--ClassifierEpochs',
     type=int,
-    default=50,
-    help='number of epochs to train the classifier, default = 50')
-
+    default=5,
+    help='number of epochs to train the classifier, default = 5')
 parser.add_argument('--data_type',
                     type=str,
-                    default="scanpy",
-                    help='type of train/test data, default="scanpy"')
+                    default="csv",
+                    help='type of train/test data, default="csv"')
 parser.add_argument("--save_iter", type=int, default=1, help="Default=1")
 parser.add_argument('--workers',
                     type=int,
                     help='number of data loading workers',
-                    default=24)
+                    default=0)
 parser.add_argument('--batchSize',
                     type=int,
                     default=128,
@@ -198,9 +197,7 @@ def main():
         # print(number_of_classes)
 
     else:
-        raise ValueError(
-            "Wrong data type, please provide Scanpy/Seurat object or h5 dataframe"
-        )
+        raise ValueError("Wrong data type, please provide h5 dataframe")
 
     start_time = time.time()
     cur_iter = 0
