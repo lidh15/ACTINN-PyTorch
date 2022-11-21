@@ -288,7 +288,7 @@ def main():
 
     save_epoch = (epoch // opt.save_iter) * opt.save_iter
 
-    save_checkpoint_classifier(cf_model, save_epoch, 0, 'LAST', opt.model_dir)
+    save_checkpoint_classifier(cf_model, save_epoch, 0, '', opt.model_dir)
     print("==> Final evaluation on validation data: ")
     evaluate_classifier(valid_data_loader,
                         cf_model,

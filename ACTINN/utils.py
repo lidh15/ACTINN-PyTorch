@@ -65,9 +65,9 @@ def save_checkpoint_classifier(model,
     """
 
     if not dir_path:
-        dir_path = "./ClassifierWeights/"
+        dir_path = "./ClassifierWeights"
 
-    model_out_path = dir_path + prefix + f"model_epoch_{epoch}_iter_{iteration}.pth"
+    model_out_path = dir_path + "/" + prefix + f"model_epoch_{epoch}_iter_{iteration}.pth"
     state = {"epoch": epoch, "Saved_Model": model}
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
