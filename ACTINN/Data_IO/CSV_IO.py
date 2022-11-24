@@ -130,8 +130,6 @@ def CSV_IO(train_path: str,
     idxer = np.unique(test_set.index, return_index=True)[1]
     test_set = test_set.iloc[idxer, ]
     print("removing duplicated")
-    test_set = test_set.loc[test_set.sum(axis=1) > 0, :]
-    print("removing singular")
     test_set.index = [s.upper() for s in test_set.index]
     test_set = test_set.loc[~test_set.index.duplicated(keep='first')]
     print("removing duplicated after upper")
@@ -190,6 +188,7 @@ def CSV_IO(train_path: str,
             "idx2train": train_index
         })[0][0]
         # have to return them after all
+        test_label = [-1] * len(test_set)
         idx2 = None
         label_to_type_dict = {}
         train_data_loader = None

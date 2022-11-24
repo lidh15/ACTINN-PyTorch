@@ -167,7 +167,7 @@ def main():
             result = opt.result if opt.result else f"result-{datetime.now():%m-%d-%H-%M-%S}.csv"
             with open(result, "w") as f:
                 # header = ["Cell type\n"] ? ["cell type\n"]
-                header = [f"{opt.header}\n"]
+                header = [f"{opt.result_header}\n"]
                 f.writelines(header +
                              [f"{cf_model.labels[i]}\n" for i in prediction])
             print(f"\tsaving result into {result}")

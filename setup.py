@@ -17,7 +17,8 @@ setup(
     download_url="https://github.com/SindiLab/ACTINN-PyTorch",
     packages=find_packages(),
     install_requires=[
-        'tqdm==4.47.0', 'torch==1.9.1'
+        'tables==3.7.0', 'pandas==1.5.2', 'scikit-learn==1.1.3',
+        'tqdm==4.47.0', 'numpy==1.23.5', 'torch==1.9.1',
     ],
     classifiers=[
         "Development Status :: 1 - Beta",
